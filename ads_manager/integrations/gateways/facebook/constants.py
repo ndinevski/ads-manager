@@ -1,0 +1,1 @@
+FACEBOOK_DATE_FORMAT = "%Y-%m-%d"  # "YYYY-MM-DD"

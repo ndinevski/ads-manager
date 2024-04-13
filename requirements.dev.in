@@ -1,0 +1,6 @@
+requests
+requests-oauthlib
+boto3
+marshmallow
+black
+isort

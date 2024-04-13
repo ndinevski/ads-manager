@@ -1,0 +1,4 @@
+requests
+requests-oauthlib
+boto3
+marshmallow
