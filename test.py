@@ -83,9 +83,36 @@ def main():
     #     user_access_token=fb_token
     # ))
 
+    # print_json(facebook_importer.create_campaign(
+    #     user_access_token=fb_token,
+    #     ad_account_id=fb_account_ids[0],
+    #     campaign_details={
+    #        'name': 'My Campaign 2',
+    #        'objective': 'OUTCOME_TRAFFIC',
+    #        'status':'PAUSED',
+    #        'special_ad_categories': ['NONE']
+    #      }
+    # ))
+
     # print_json(facebook_exporter.get_campaigns_details(
     #     user_access_token=fb_token,
     #     account_ids=fb_account_ids,
+    # ))
+
+    # print_json(facebook_importer.create_ad_set(
+    #     user_access_token=fb_token,
+    #     ad_account_id=fb_account_ids[0],
+    #     adset_details={
+    #         'name': 'My AdSet 2',
+    #         'optimization_goal': 'IMPRESSIONS',
+    #         'billing_event': 'IMPRESSIONS',
+    #         'bid_amount': 20,
+    #         'promoted_object': {},
+    #         'daily_budget': 1000,
+    #         'campaign_id': ['120330000915611219'],
+    #         'targeting': {'geo_locations':{'countries':['US']}},
+    #         'status': 'PAUSED',
+    #     }
     # ))
 
     # print_json(facebook_exporter.get_adsets_details(
