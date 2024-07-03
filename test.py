@@ -1,5 +1,6 @@
 import datetime
 import ast
+import json
 import os
 from dotenv import load_dotenv
 
@@ -8,6 +9,7 @@ from ads_manager.services.facebook import importer as facebook_importer
 from ads_manager.services.facebook import exporter as facebook_exporter
 from ads_manager.services.tiktok import importer as tiktok_importer
 from ads_manager.services.tiktok import exporter as tiktok_exporter
+from ads_manager.services.uploader import s3_uploader as s3_uploader
 from ads_manager import enums
 
 
@@ -18,59 +20,15 @@ def print_json(message):
 def main():
     load_dotenv()
 
-    fb_token = "EAANY2CrI0jUBO80TYU3COJfdSOQw0POgUuTmg69nWSt1cFwqfyjqgFiOXoCIgFXtcYvren482XwZC5RbHPZAktZByJomwzQpEZC5drDNq0V1tg5C23emycb7oaHECFeybQAiCCq3IxdmPJzEbeMCNQpBCqr8djUEFiZCxkgmHYcfPHUsjw8yuLHJwIOabrF4waUWXQ6WW"
-    fb_account_ids = ["act_366883153087738"]
+    fb_token = os.getenv("FB_TOKEN")
+    fb_account_ids = ast.literal_eval(os.getenv("FB_ACCOUNT_IDS"))
     tt_token = os.getenv("TT_TOKEN")
     tt_account_ids = ast.literal_eval(os.getenv("TT_ACCOUNT_IDS"))
     tt_app_id = os.getenv("TT_APP_ID")
     tt_secret = os.getenv("TT_SECRET")
+    s3_path = os.getenv("S3_PATH")
 
     # I. EXPORTER SERVICES (TikTok, Facebook, Unified)
-    #
-    # - REPORT:
-    # Note:
-    # except for comments in brackets '()' next to functionalities,
-    # everything is functioning properly and no issues detected
-    # there is use of labels, empty (explained at the first appearance)
-    # and not supported in sandbox. As well as other descriptive labels.
-    # Additionally, in all tests invalid or incorrect inputs were tested,
-    # similar to invalid inputs tests for get_campaigns_details in TikTok.
-    #
-    # 1. Verified and tested TIKTOK exporter functionalities:
-    #   - get_account_ids (not supported in sandbox)
-    #   - get_campaigns_details
-    #   - get_adgroups_details
-    #   - get_ads_details (IMPORTANT : checked docs, works properly and fields are correct
-    #                      but no ads in response, response is empty. Probably because of
-    #                      no ads created and there is no data. I will denote all upcoming
-    #                      same instances with the 'empty')
-    #   - get_campaign_insights (empty)
-    #   - get_adset_insights (empty)
-    #   - get_ad_insights (empty)
-    #   - get_images_details (not supported in sandbox)
-    #   - get_videos_details (not supported in sandbox)
-    # 2. Verified and tested FACEBOOK exporter functionalities:
-    #   - get_account_ids
-    #   - get_campaigns_details
-    #   - get_adsets_details (empty)
-    #   - get_ads_details (empty)
-    #   - get_campaign_insights (empty)
-    #   - get_adset_insights (empty)
-    #   - get_ad_insights (empty)
-    #   - get_ad_creatives_list (empty)
-    #   - get_ad_creatives (don't have asset_ids to test)
-    # 3. Verified and tested UNIFIED exporter functionalities:
-    #   - get_account_ids (not supported for TikTok)
-    #   - get_campaigns_details
-    #   - get_adsets_details (Facebook empty | TikTok okay)
-    #   - get_ads_details (empty)
-    #   - get_campaign_insights (empty)
-    #   - get_adset_insights (empty)
-    #   - get_ad_insights (empty)
-    #   - get_insights_by_resource_type (Campaign, Ad set, Ad) (empty)
-
-    # - TESTS:
-
     # TIKTOK :
 
     # print_json(tiktok_exporter.get_campaigns_details(
@@ -289,45 +247,7 @@ def main():
     #     date_from=datetime.datetime(2023, 1, 1),
     #     date_to=datetime.datetime(2023, 12, 30)))
 
-    # QUESTIONS:
-    #     - To make params in unified default value None, so when used
-    #       with Facebook platform it is not needed to imput an empty
-    #       params dictionary.
-
     # II. IMPORTER SERVICES (TikTok, Facebook, Unified)
-    #
-    # - REPORT:
-    # Note:
-    # except for comments in brackets '()' next to functionalities,
-    # everything is functioning properly and no issues detected
-    # there is use of labels, empty (explained at the first appearance)
-    # and not supported in sandbox. As well as other descriptive labels.
-    # Additionally, in all tests invalid or incorrect inputs were tested,
-    # similar to invalid inputs tests for get_campaigns_details in TikTok.
-
-    # 1. Verified and tested TIKTOK importer functionalities:
-    #   - create_campaign
-    #   - update_campaign
-    #   - create_ad_group
-    #   - update_ad_group
-    #   - create_ads (Invalid identity_id)
-    #   - update_ads (Invalid identity_id)
-    #   - update_ads_status
-    #   - create_image
-    #   - update_image_name (not supported in sandbox)
-    #   - create_video
-    #   - update_video_name (not supported in sandbox)
-    # 2. Verified and tested FACEBOOK importer functionalities:
-    #   - Waiting for sandbox account to test importer functionalities
-    # 3. Verified and tested UNIFIED importer functionalities (tested for TT):
-    #   - create_campaign
-    #   - update_campaign
-    #   - create_ad_group
-    #   - update_ad_group
-    #   - create_ads (Invalid identity_id)
-
-    # - TESTS:
-
     # TIKTOK :
 
     # print_json(tiktok_importer.create_campaign(
@@ -649,6 +569,29 @@ def main():
     #     },
     #     params={'sandbox': True}
     # ))
+
+    # III. Uploader Services
+    # Upload resources to S3
+    # campaigns_details = json.loads(tiktok_exporter.get_campaigns_details(
+    #     user_access_token=tt_token,
+    #     params={'sandbox': True},
+    #     account_ids=tt_account_ids))
+    # ads_details = json.loads(tiktok_exporter.get_ads_details(
+    #     user_access_token=tt_token,
+    #     params={'sandbox': True},
+    #     account_ids=tt_account_ids))
+    # upload_campaigns_to_s3 = s3_uploader.upload_resource_details(
+    #     s3_path=s3_path,
+    #     resource_details=campaigns_details,
+    #     resource_type=enums.ResourceType.CAMPAIGN
+    # )
+    # upload_ads_to_s3 = s3_uploader.upload_resource_details(
+    #     s3_path=s3_path,
+    #     resource_details=ads_details,
+    #     resource_type=enums.ResourceType.AD
+    # )
+    # print(upload_campaigns_to_s3)
+    # print(upload_ads_to_s3)
 
 
 if __name__ == "__main__":
