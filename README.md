@@ -471,36 +471,9 @@ tiktok_importer.update_video_name(
     params='<PARAMS>'  # Dictionary, set 'sandbox' to True if using a sandbox account for testing
 )
 ```
-### Uploader Services
 
-The `s3_uploader` service contains all the functions upload resources to AWS S3. Important to note that your global configuration for AWS must be set, for the S3 Bucket path to be recognized.<br/><br/>
-
-```python
-from ads_manager.services.uploader import s3_uploader as s3_uploader
-
-s3_uploader.upload_resource_details(
-    s3_path='<S3_PATH>',  # Path to your S3 bucket.
-    resource_details='<RESOURCE_DETAILS>',  # Data from resource in JSON format
-    resource_type='<RESOURCE_TYPE>' # Resource type
-)
-
-s3_uploader.upload_resource_insights(
-    s3_path='<S3_PATH>',  # Path to your S3 bucket.
-    resources_insights='<RESOURCE_INSIGHTS',  # Data from resource in JSON format
-    resource_type='<RESOURCE_TYPE' # Resource type
-)
-
-s3_uploader.upload_facebook_ad_creatives(
-    s3_path='<S3_PATH>',  # Path to your S3 bucket.
-    ad_creatives='<AD_CREATIVES>',  # Data from Facebook Ad Creatives in JSON format
-)
-```
 <br/>
 
 #### Visual representation of Facebook and TikTok Ads Structure:
 
-![Ads Structure](media/graph.png)
-
-#### Diagram of structure
-
-![Diagram structure](media/diagram.png)
+![Sample Image](media/graph.png)
